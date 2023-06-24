@@ -34,7 +34,7 @@ def foo(path):
 
 	# Create Node objects and store them in the dictionary
 	for node_id, label in node_labels:
-		# node = Node(label, int(node_id))
+		node = Node(label, int(node_id))
 		nodes[node_id] = label
 
 	# Create a list to store edges
@@ -61,12 +61,46 @@ def foo(path):
 		G.add_edge(edge.a, edge.b)
 		print(f"A: {edge.a}, B: {edge.b}")
 
-	# Draw the graph
-	pos = nx.spring_layout(G)  # Position the nodes using a spring layout algorithm
-	labels = nx.get_node_attributes(G, 'label')  # Get the node labels
-	nx.draw_networkx(G, pos, labels=labels)
+
+# Draw the graph
+def draw_graph(graph):
+	pos = nx.spring_layout(graph)  # Position the nodes using a spring layout algorithm
+	labels = nx.get_node_attributes(graph, 'label')  # Get the node labels
+	# print(nx.adjacency_matrix(G))
+	nx.draw_networkx(graph, pos, labels=labels)
 	plt.show()
 
 
+# Depth-First Search (DFS)
+def dfs(graph, start_node):
+	visited = set()  # Set to keep track of visited nodes
+	stack = [start_node]  # Stack for DFS traversal
+
+	while stack:
+		node = stack.pop()
+		if node not in visited:
+			print(node)
+			visited.add(node)
+			neighbors = graph.neighbors(node)  # Get neighbors of the current node
+			stack.extend(neighbors)
+
+
+# # Perform DFS traversal
+# visited = set()  # Set to keep track of visited nodes
+
+# def dfs(graph, node):
+#     visited.add(node)
+#     print(node)
+
+#     neighbors = graph.neighbors(node)  # Get neighbors of the current node
+#     for neighbor in neighbors:
+#         if neighbor not in visited:
+#             dfs(graph, neighbor)
+
+# # Call the DFS function starting from node 1
+# dfs(G, 1)
+
 if __name__ == '__main__':
   foo(path=sys.argv[1].encode('utf-8'))
+  dfs(G, 1)
+  draw_graph(G)
