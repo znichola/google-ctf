@@ -120,8 +120,16 @@ def bin_search(word : str):
 # print(ordered_words[n-1], ordered_words[n], ordered_words[n+1])
 # print(n)
 
+wrd = ["apple", "banna"]
+w = ''.join(wrd)
+f = "applebannaorange"
+
+print(f.find(w))
+print(f[len(w):])
+# exit()
 
 words_found : set = set()
+words_found_nodes : set = set()
 
 # check all paths through the nodes that lead to full words
 def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
@@ -131,23 +139,16 @@ def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
 			visited.append(str(G.nodes[n]['label']))
 
 			word = ''.join(visited)
-			if so_far != '':
-				i = word.find(so_far)
-				if i == -1:
-					so_far = ''
-				else:
-					word = word[0:len(so_far)]
 
 			idx = bin_search(word)
 			closet_word = ordered_words[idx]
 			closet_word2 = ordered_words[idx+1] # this is an overflow waiting to happen, but enh
 
-			# only search short ifthere is a possible match
+			# only search if there is a possible match
 			if (not (closet_word.find(word) == -1
 					and closet_word2.find(word) == -1)):
 				if word == closet_word:
 					print("    found:", word)
-					so_far += word
 					words_found.add(word)
 
 				# break if we've exhaused all nodes
@@ -155,7 +156,10 @@ def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
 					return
 
 				# recursivly call the function
-				visit2(set(G.neighbors(n)), set(to_visit), list(visited), str(so_far))
+				visit2(set(G.neighbors(n)), set(to_visit), list(visited), list(so_far))
+
+
+			# undo last addition for backtracking
 			visited.pop()
 			to_visit.add(n)
 
@@ -167,7 +171,7 @@ def find_multi_word():
 		to_visit.remove(n)
 		visited : list = [str(G.nodes[n]['label'])]
 		print("starting with :", visited[0])
-		visit2(neighbors, to_visit, visited, '')
+		visit2(neighbors, to_visit, visited, [])
 
 
 if __name__ == '__main__':
@@ -176,15 +180,4 @@ if __name__ == '__main__':
 	# find_word()
 	find_multi_word()
 
-	# letters = [G.nodes[n]['label'] for n in G.nodes]
-
-	# print(''.join(letters))
-	# print(len(words_found))
-	# print(words_found)
-	# for w in words_found:
-	# 	for e in words_found:
-
-	# 		pass
-
-	# print([len(w) for w in words_found])
-	# draw_graph(G)
+	print(set(words_found))
