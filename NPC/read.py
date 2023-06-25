@@ -13,7 +13,7 @@ def get_word_list():
 # Create an empty graph
 G = nx.Graph()
 
-hasher = get_word_list()
+possible_words : set = get_word_list()
 
 def foo(path):
 	# Open the file
@@ -34,106 +34,52 @@ def foo(path):
 	for node_a_id, node_b_id in edges:
 		G.add_edge(int(node_a_id), int(node_b_id))
 
-
 # Print the nodes
 def print_graph(g):
-	print("Node:")
-	for node in G.nodes:
-		label = G.nodes[node]['label']  # Get the label of the node
-		print(f"ID: {node}, Label: {label}")
+	print("Node : connedtions")
+	for n in G:
+		print("  ", G.nodes[n]['label'], "  ", end='')
 
-	# Print the edges
-	print("Edges:")
-	for edge in g.edges:
-		print(edge)
-
+		# for each node we find it's neighbours
+		# and with comprehension to oneliner it
+		print(''.join(str(G.nodes[i]['label']) for i in G.neighbors(n)))
 
 # Draw the graph
 def draw_graph(g):
 	pos = nx.spring_layout(g)  # Position the nodes using a spring layout algorithm
 	labels = nx.get_node_attributes(g, 'label')  # Get the node labels
-	# print(nx.adjacency_matrix(G))
 	nx.draw_networkx(g, pos, labels=labels)
-	# plt.show()
+	# plt.show() # dosn't work on wsl, use below
 	plt.savefig("mygraph.png")
 
-
-
-
-def dfs(node): # a list of node paths starting form the node
-
-	# Perform DFS traversal
-	visited = set()  # Set to keep track of visited nodes
-
-	visited.add(node)
-
-	neighbors = G.neighbors(node)  # Get neighbors of the current node
-	for neighbor in neighbors:
-		if neighbor not in visited:
-			print("visited: ", neighbor)
-			dfs(neighbor)
-
-
-# def generate_and_test(vertices, subset):
-# 	print("testing:", vertices)
-# 	if not vertices:
-# 		# Check if the subset induces a connected subgraph
-# 		if nx.is_connected(G.subgraph(subset)):
-# 			yield subset
-# 	else:
-# 		v = vertices[0]  # Choose a vertex v from the remaining vertices
-# 		generate_and_test(vertices[1:], subset)
-# 		generate_and_test(vertices[1:], subset + [v])
-
-
+# check all paths through the nodes that lead to full words
 def visit(neighbors : set, to_visit : set, visited : list):
-	# print(to_visit)
-	# print(neibours)
 	for n in neighbors:
 		if n in to_visit:
 			to_visit.remove(n)
 			visited.append(n)
 			if (len(visited) == len(G.nodes)):
 				word = ''.join(str(G.nodes[i]['label']) for i in visited)
-				if word in hasher:
+				if word in possible_words:
 					print(word)
 				return
-			# print(G.nodes[n]['label'], end='')
 			visit(set(G.neighbors(n)), set(to_visit), list(visited))
 			visited.pop()
 			to_visit.add(n)
-			# if len(to_visit) == 0:
-				# print("")
 
-
-if __name__ == '__main__':
-	foo(path=sys.argv[1].encode('utf-8'))
-	print_graph(G)
-
-	all_nodes = list(G.nodes)
-
-	# dfs(all_nodes[0])
-	# subsets = generate_and_test(all_nodes, [])
-	# print("Connected Subsets:")
-	# for subset in subsets:
-	# 	print(subset)
-
-	# itterator for all the nodes
-	for n in G:
-		print(G.nodes[n]['label'], ": ", end='')
-
-		# for each node we find it's neighbours
-		for nei in G.neighbors(n):
-			print(G.nodes[nei]['label'], end='')
-		print("")
-
+def find_word():
+	print("single word password = ", end="")
 	for n in G:
 		neighbors = set(G.neighbors(n))
 		to_visit = set(G.nodes)
 		to_visit.remove(n)
 		visited : list = [n]
-
-		# print("visiting : ", G.nodes[n]['label'], end=' ')
 		visit(neighbors, to_visit, visited)
-		# print("")
+
+if __name__ == '__main__':
+	foo(path=sys.argv[1].encode('utf-8'))
+	print_graph(G)
+	find_word()
+
+
 	# draw_graph(G)

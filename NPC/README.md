@@ -43,3 +43,16 @@ We meed to look at the graph and un shuffel the letters to find the passpord.
 ### `USACONST.TXT`
 
 This is the us constituion as text. Reading the source code we can that it's used a catalog of words from which a passpord can be made up of. The words are first all lowercased then white space removed and finally split into a list. This is then added to a set to remove duplicates. We randomly pick the number of words wanted for the password and concat. This is how the password is generated.
+
+
+###
+
+Solving multi word passwords
+
+```
+$> python3 encrypt.py 2 "the flag goes here"
+Your secret is now inside password-protected file secret.age.
+Use the password defendthan to access it.
+In case you forgot the password, maybe hint.dot will help your memory.
+$>
+```
