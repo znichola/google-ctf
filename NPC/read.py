@@ -120,7 +120,8 @@ def bin_search(word : str):
 # print(ordered_words[n-1], ordered_words[n], ordered_words[n+1])
 # print(n)
 
-# exit()
+
+words_found : set = set()
 
 # check all paths through the nodes that lead to full words
 def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
@@ -130,15 +131,24 @@ def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
 			visited.append(str(G.nodes[n]['label']))
 
 			word = ''.join(visited)
+			if so_far != '':
+				i = word.find(so_far)
+				if i == -1:
+					so_far = ''
+				else:
+					word = word[0:len(so_far)]
+
 			idx = bin_search(word)
 			closet_word = ordered_words[idx]
-			closet_word2 = ordered_words[idx+1]
+			closet_word2 = ordered_words[idx+1] # this is an overflow waiting to happen, but enh
 
 			# only search short ifthere is a possible match
 			if (not (closet_word.find(word) == -1
 					and closet_word2.find(word) == -1)):
 				if word == closet_word:
 					print("    found:", word)
+					so_far += word
+					words_found.add(word)
 
 				# break if we've exhaused all nodes
 				if (len(visited) == num_noded):
@@ -150,7 +160,7 @@ def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
 			to_visit.add(n)
 
 def find_multi_word():
-	print("multi word password = ", end="")
+	# print("multi word password = ", end="")
 	for n in G:
 		neighbors = set(G.neighbors(n))
 		to_visit = set(G.nodes)
@@ -166,4 +176,15 @@ if __name__ == '__main__':
 	# find_word()
 	find_multi_word()
 
+	# letters = [G.nodes[n]['label'] for n in G.nodes]
+
+	# print(''.join(letters))
+	# print(len(words_found))
+	# print(words_found)
+	# for w in words_found:
+	# 	for e in words_found:
+
+	# 		pass
+
+	# print([len(w) for w in words_found])
 	# draw_graph(G)
