@@ -1,0 +1,56 @@
+python3 read.py multi2/hint.dot >> out  10.38s user 0.22s system 102% cpu 10.313 total
+
+Node : connedtions
+   c   esriwrtee
+   t   eepiwtce
+   w   eistc
+   e   patrc
+   e   irct
+   s   ctr
+   p   treit
+   r   pcai
+   i   eept
+   e   wtcia
+   r   seces
+   s   wtr
+   a   eier
+   i   twacr
+   t   pisst
+multi word password = starting with : c
+starting with : t
+twice
+twice
+twice
+starting with : w
+we
+starting with : e
+starting with : e
+starting with : s
+starting with : p
+starting with : r
+starting with : i
+it
+starting with : e
+starting with : r
+re
+receipt
+receipt
+receipts
+receipts
+receipt
+receipt
+receipts
+receipts
+re
+receipt
+receipt
+receipts
+receipts
+starting with : s
+swear
+starting with : a
+starting with : i
+it
+its
+its
+starting with : t

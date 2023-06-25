@@ -56,3 +56,22 @@ Use the password defendthan to access it.
 In case you forgot the password, maybe hint.dot will help your memory.
 $>
 ```
+
+
+```
+$> python3 encrypt.py 3 "flag goes here"
+Your secret is now inside password-protected file secret.age.
+Use the password securityarticlesexcepted to access it.
+In case you forgot the password, maybe hint.dot will help your memory.
+$> cd ..
+```
+
+```
+Your secret is now inside password-protected file secret.age.
+Use the password swearitsreceipt to access it.
+In case you forgot the password, maybe hint.dot will help your memory.
+```
+
+## Preformance problems
+
+Preformance turns out to be a issue for the longer passwords, a single word password is ok, 2 starts slowing down and 3 is at least over 30mins didn't let it run for longer
