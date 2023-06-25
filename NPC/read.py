@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pygtrie as trie
 import math
+import copy
 
 # gen list of words
 def get_word_list():
@@ -129,17 +130,17 @@ print(f[len(w):])
 # exit()
 
 words_found : set = set()
-words_found_nodes : set = set()
+words_found_nodes : list = list()
 
 # check all paths through the nodes that lead to full words
-def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
+def visit2(neighbors : set, to_visit : set, visited : list, vn : list, so_far : list):
 	for n in neighbors:
 		if n in to_visit:
 			to_visit.remove(n)
 			visited.append(str(G.nodes[n]['label']))
+			vn.append(n)
 
 			word = ''.join(visited)
-
 			idx = bin_search(word)
 			closet_word = ordered_words[idx]
 			closet_word2 = ordered_words[idx+1] # this is an overflow waiting to happen, but enh
@@ -150,17 +151,18 @@ def visit2(neighbors : set, to_visit : set, visited : list, so_far : list):
 				if word == closet_word:
 					print("    found:", word)
 					words_found.add(word)
+					words_found_nodes.append(copy.deepcopy(vn))
 
 				# break if we've exhaused all nodes
 				if (len(visited) == num_noded):
 					return
 
 				# recursivly call the function
-				visit2(set(G.neighbors(n)), set(to_visit), list(visited), list(so_far))
-
+				visit2(set(G.neighbors(n)), set(to_visit), list(visited), list(vn), list(so_far))
 
 			# undo last addition for backtracking
 			visited.pop()
+			vn.pop()
 			to_visit.add(n)
 
 def find_multi_word():
@@ -171,7 +173,7 @@ def find_multi_word():
 		to_visit.remove(n)
 		visited : list = [str(G.nodes[n]['label'])]
 		print("starting with :", visited[0])
-		visit2(neighbors, to_visit, visited, [])
+		visit2(neighbors, to_visit, visited, [], [])
 
 
 if __name__ == '__main__':
@@ -180,4 +182,20 @@ if __name__ == '__main__':
 	# find_word()
 	find_multi_word()
 
-	print(set(words_found))
+	print(words_found)
+	# [G.nodes[l]['label'] for l in w]
+	print([ ''.join([G.nodes[l]['label'] for l in w]) for w in words_found_nodes])
+	# print(words_found_nodes)
+
+	# use set math to figure out the right como of words I think
+
+	all_nodes = frozenset(G)
+	words = [frozenset(s) for s in words_found_nodes]
+
+	for w in words:
+		wrds = words
+		wrds.remove(w)
+		for i in wrds:
+			# print("checking:", ''.join(w), ''.join(i))
+			if w & i is all_nodes:
+				print("found it:", w, i)
