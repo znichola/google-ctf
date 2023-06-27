@@ -2,7 +2,6 @@ import re
 import sys
 import networkx as nx
 import matplotlib.pyplot as plt
-import pygtrie as trie
 import math
 import copy
 
@@ -82,19 +81,6 @@ def find_word():
 
 num_noded = len(G.nodes)
 
-already_seen : set = {}
-
-# word_trie = trie.StringTrie()
-# word_trie["testthis"] = None
-# word_trie["test_this"] = None
-# word_trie["wizz"] = None
-# word_trie["bag"] = None
-# word_trie["bagbag_you_cut_me_down"] = None
-# sdf = "testthis"
-# print(word_trie.has_node(sdf) == trie.Trie.HAS_VALUE)
-# print(word_trie.has_node(sdf) == trie.Trie.HAS_SUBTRIE)
-# exit()
-
 ordered_words = list(possible_words)
 ordered_words.sort(reverse=False)
 # print(ordered_words)
@@ -143,13 +129,17 @@ def visit2(neighbors : set, to_visit : set, visited : list, vn : list, so_far : 
 			word = ''.join(visited)
 			idx = bin_search(word)
 			closet_word = ordered_words[idx]
-			closet_word2 = ordered_words[idx+1] # this is an overflow waiting to happen, but enh
+
+			if idx == len(ordered_words) - 1:
+				closet_word2 = closet_word
+			else:
+				closet_word2 = ordered_words[idx+1]
 
 			# only search if there is a possible match
 			if (not (closet_word.find(word) == -1
 					and closet_word2.find(word) == -1)):
 				if word == closet_word:
-					print("    found:", word)
+					# print("    found:", word)
 					words_found.add(word)
 					words_found_nodes.append(copy.deepcopy(vn))
 
@@ -172,8 +162,34 @@ def find_multi_word():
 		to_visit = set(G.nodes)
 		to_visit.remove(n)
 		visited : list = [str(G.nodes[n]['label'])]
-		print("starting with :", visited[0])
-		visit2(neighbors, to_visit, visited, [], [])
+		# print("starting with :", visited[0])
+		visit2(neighbors, to_visit, visited, [n], [])
+
+def get_word(word):
+	return ''.join([ G.nodes[w]['label'] for w in word ])
+
+def make_set(words : list):
+	s : set = set()
+	s.add(123)
+	for w in words:
+		# print(w)
+		# print(s)
+		s = s & w
+	return s
+
+def rec_add(password : set, words_to_check : set, letters_left : set):
+	# print("here", get_word(password))
+	if len(letters_left) == 0:
+		print("used all letters and nodes")
+		return
+	if password == letters_left:
+		print("found", get_word(password))
+		return
+	for word in words_to_check:
+		new_pass = password | word
+		# print(get_word(new_pass), get_word(word), get_word(password ^ word))
+		if new_pass == (password ^ word):
+			rec_add(new_pass, words_to_check - word, letters_left)
 
 
 if __name__ == '__main__':
@@ -182,6 +198,9 @@ if __name__ == '__main__':
 	# find_word()
 	find_multi_word()
 
+	# draw_graph(G)
+	# exit()
+
 	print(words_found)
 	# [G.nodes[l]['label'] for l in w]
 	print([ ''.join([G.nodes[l]['label'] for l in w]) for w in words_found_nodes])
@@ -189,13 +208,27 @@ if __name__ == '__main__':
 
 	# use set math to figure out the right como of words I think
 
-	all_nodes = frozenset(G)
+	all_nodes = set(G)
 	words = [frozenset(s) for s in words_found_nodes]
 
-	for w in words:
-		wrds = words
-		wrds.remove(w)
-		for i in wrds:
-			# print("checking:", ''.join(w), ''.join(i))
-			if w & i is all_nodes:
-				print("found it:", w, i)
+	rec_add(set(), set(words), set(all_nodes))
+
+	# print([get_word(w) for w in words ])
+
+
+	# for w in words:
+	# 	wrd = list(words)
+	# 	for i in wrd:
+	# 		if w.isdisjoint(i):
+	# 			print(get_word(w), get_word(i))
+	# 			print(get_word(w | i))
+
+	# for w in words:
+	# 	wrds = words
+	# 	wrds.remove(w)
+	# 	for i in wrds:
+	# 		# print("checking:", ''.join(w), ''.join(i))
+	# 		print(get_word(w), get_word(i))
+	# 		print(get_word(all_nodes))
+	# 		if w & i is all_nodes:
+	# 			print("found it:", w, i)
