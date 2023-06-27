@@ -209,26 +209,28 @@ if __name__ == '__main__':
 	# use set math to figure out the right como of words I think
 
 	all_nodes = set(G)
-	words = [frozenset(s) for s in words_found_nodes]
+	words_set  = [frozenset(s) for s in words_found_nodes]
+	words_word = [get_word(w) for w in words_found_nodes]
 
-	rec_add(set(), set(words), set(all_nodes))
+	words = dict(zip(words_word, words_set))
 
-	# print([get_word(w) for w in words ])
+	print(words)
 
-
-	# for w in words:
-	# 	wrd = list(words)
-	# 	for i in wrd:
-	# 		if w.isdisjoint(i):
-	# 			print(get_word(w), get_word(i))
-	# 			print(get_word(w | i))
-
-	# for w in words:
-	# 	wrds = words
-	# 	wrds.remove(w)
-	# 	for i in wrds:
-	# 		# print("checking:", ''.join(w), ''.join(i))
-	# 		print(get_word(w), get_word(i))
-	# 		print(get_word(all_nodes))
-	# 		if w & i is all_nodes:
-	# 			print("found it:", w, i)
+	# find groups of word sets that don't overlap
+	for w in words:
+		print(w)
+		wrds = copy.deepcopy(words)
+		wrds.pop(w)
+		word_group_list = list()
+		word_group_list.append(w)
+		word_group_set  = words[w]
+		for i in wrds:
+			# print("here", word_group_set)
+			# print("here", words[i])
+			if word_group_set.isdisjoint(words[i]):
+				word_group_set = word_group_set | words[i]
+				word_group_list.append(i)
+				# print("adding:", i, words[i])
+				# print(word_group_set)
+		if (all_nodes.issubset(word_group_set)):
+			print(word_group_list)
