@@ -201,7 +201,7 @@ if __name__ == '__main__':
 	# draw_graph(G)
 	# exit()
 
-	print(words_found)
+	# print(words_found)
 	# [G.nodes[l]['label'] for l in w]
 	print([ ''.join([G.nodes[l]['label'] for l in w]) for w in words_found_nodes])
 	# print(words_found_nodes)
@@ -212,25 +212,27 @@ if __name__ == '__main__':
 	words_set  = [frozenset(s) for s in words_found_nodes]
 	words_word = [get_word(w) for w in words_found_nodes]
 
-	words = dict(zip(words_word, words_set))
+	words = dict(zip(words_set, words_word))
 
 	print(words)
 
 	# find groups of word sets that don't overlap
 	for w in words:
-		print(w)
+		print(words[w])
 		wrds = copy.deepcopy(words)
 		wrds.pop(w)
 		word_group_list = list()
-		word_group_list.append(w)
-		word_group_set  = words[w]
+		word_group_list.append(words[w])
+		word_group_set  = w
 		for i in wrds:
-			# print("here", word_group_set)
+			# print("here", word_group_list)
 			# print("here", words[i])
-			if word_group_set.isdisjoint(words[i]):
-				word_group_set = word_group_set | words[i]
-				word_group_list.append(i)
-				# print("adding:", i, words[i])
+			if w.isdisjoint(i):
+				word_group_set = word_group_set | i
+				word_group_list.append(words[i])
+				print("adding:", i, words[i])
 				# print(word_group_set)
+
+		# only print them is they contain the full set of nodes
 		if (all_nodes.issubset(word_group_set)):
 			print(word_group_list)
