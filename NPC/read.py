@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import math
 import copy
+import pyrage
 
 # gen list of words
 def get_word_list():
@@ -191,55 +192,47 @@ def rec_add(password : set, words_to_check : set, letters_left : set):
 		if new_pass == (password ^ word):
 			rec_add(new_pass, words_to_check - word, letters_left)
 
-def find_matches(words : dict, all_nodes : set):
-	# find groups of word sets that don't overlap
-	for w in words:
-		# print(words[w])
-		if all_nodes.issubset(set(w)):
-			print("\033[1;32m~~ wrd match:\033[0;0m", words[w])
-			return (w)
+possible_paths : list = list()
 
-		for i in words:
+def find_matches(w, words : dict, all_nodes : set):
+	# if all_nodes.issubset(set(w)):
+	# 	print("\033[1;32m~~ wrd match:\033[0;0m ~~ ", words[w])
+	# 	return (w)
 
-			# we know the two words are compatible
-			if set(w).isdisjoint(i):
+	for i in words:
+		# we know the two words are compatible
+		if set(w).isdisjoint(i):
+			# get last node in word
+			last_letter = w[-1]
+			first_letter = i[0]
+			flag = 0
+			# find if i follows from w
+			if first_letter in set(nx.neighbors(G, last_letter)):
+				# print("~~ sequence :", words[w], words[i])
+				flag += 1
 
-				# get last node in word
-				# last_letter = words_found_nodes[words_set.index(w)][-1]
-				# first_letter = words_found_nodes[words_set.index(i)][0]
+			# find if it's using all the nodes
+			if all_nodes.issubset(set(w) | set(i)):
+				# print("~~ is subset:", words[w], words[i])
+				flag += 2
+			if flag == 3:
+				print("\033[1;32m~~     match:\033[0;0m", words[w] + words[i])
+				possible_paths.append(words[w] + words[i])
+				# return (w, i)
 
-				last_letter = w[-1]
-				first_letter = i[0]
-
-				flag = 0
-
-				# find if i follows from w
-				if first_letter in set(nx.neighbors(G, last_letter)):
-					# print("~~ sequence :", words[w], words[i])
-					flag += 1
-				else:
-					continue
-				# find if it's using all the nodes
-				if all_nodes.issubset(set(w) | set(i)):
-					# print("~~ is subset:", words[w], words[i])
-					flag += 2
-				if flag == 3:
-					print("\033[1;32m~~     match:\033[0;0m", words[w], words[i])
-					return (w, i)
-
-				# recursivly check
-				if flag == 1:
-					words2 = copy.deepcopy(words)
-					words2.pop(w)
-					words2.pop(i)
-					words2[tuple(list(w) + list(i))] = str(words[w] + words[i])
-					# print("~~     rec  :", words[w], words[i])
-					ret = find_matches(words2, all_nodes)
-					if ret is not None:
-						return ret
-					# print("~~ leave rec:", words[w], words[i], "ret", ret)
-
-		# only print them is they contain the full set of nodes
+			# recursivly check
+			if flag == 1:
+				words2 = copy.deepcopy(words)
+				words2.pop(w)
+				words2.pop(i)
+				w2 = tuple(list(w) + list(i))
+				words2[w2] = str(words[w] + words[i])
+				# print("~~     rec  :", words[w], words[i])
+				ret = find_matches(w2, words2, all_nodes)
+				if ret is not None:
+					return ret
+				# print("~~ leave rec:", words[w], words[i], "ret", ret)
+	# only print them is they contain the full set of nodes
 
 
 if __name__ == '__main__':
@@ -248,7 +241,7 @@ if __name__ == '__main__':
 	# find_word()
 	find_multi_word()
 
-	# draw_graph(G)
+	draw_graph(G)
 	# exit()
 
 	# print(words_found)
@@ -263,11 +256,19 @@ if __name__ == '__main__':
 	words_word = [get_word(w) for w in words_found_nodes]
 
 	words = dict(zip(words_set, words_word))
-	ret = find_matches(words, all_nodes)
-	if ret is None:
-		print(ret)
-	# else:
-	# 	if len(ret) == 2:
-	# 		print(words[ret[0]], words[ret[1]])
-	# 	elif len (ret) == 1:
-	# 		print(words[ret[0]])
+
+	for w in words:
+		# words2 = copy.deepcopy(words)
+		# words2.pop(w)
+		find_matches(w, words, all_nodes)
+
+	print("attempting decryption .. ")
+	for p in possible_paths:
+		print("with password:", p, end="")
+		with open(sys.argv[2], 'rb') as f:
+			encrypted = f.read()
+			try:
+				decrypted = pyrage.passphrase.decrypt(encrypted, p)
+				print(" yes!, flag is: ", decrypted)
+			except:
+				print(" .. nope")
