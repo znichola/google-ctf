@@ -214,25 +214,39 @@ if __name__ == '__main__':
 
 	words = dict(zip(words_set, words_word))
 
-	print(words)
+	# print(words)
+
+	for w in words:
+		print(words[w])
+
+	print("skdjfhdshfkh\n")
 
 	# find groups of word sets that don't overlap
 	for w in words:
 		print(words[w])
-		wrds = copy.deepcopy(words)
-		wrds.pop(w)
-		word_group_list = list()
-		word_group_list.append(words[w])
-		word_group_set  = w
-		for i in wrds:
-			# print("here", word_group_list)
-			# print("here", words[i])
+		if all_nodes.issubset(w):
+			print("\033[1;32m~~ wrd match:\033[0;0m", words[w])
+
+		for i in words:
+
+			# we know the two words are compatible
 			if w.isdisjoint(i):
-				word_group_set = word_group_set | i
-				word_group_list.append(words[i])
-				print("adding:", i, words[i])
-				# print(word_group_set)
+
+				# get last node in word
+				last_letter = words_found_nodes[words_set.index(w)][-1]
+				first_letter = words_found_nodes[words_set.index(i)][0]
+
+				flag = 0
+
+				# find if i follows from w
+				if first_letter in set(nx.neighbors(G, last_letter)):
+					print("~~ sequence :", words[w], words[i])
+					flag += 1
+				# find if it's using all the nodes
+				if all_nodes.issubset(w | i):
+					print("~~ is subset:", words[w], words[i])
+					flag += 1
+				if flag == 2:
+					print("\033[1;32m~~     match:\033[0;0m", words[w], words[i])
 
 		# only print them is they contain the full set of nodes
-		if (all_nodes.issubset(word_group_set)):
-			print(word_group_list)
