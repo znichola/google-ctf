@@ -191,6 +191,56 @@ def rec_add(password : set, words_to_check : set, letters_left : set):
 		if new_pass == (password ^ word):
 			rec_add(new_pass, words_to_check - word, letters_left)
 
+def find_matches(words : dict, all_nodes : set):
+	# find groups of word sets that don't overlap
+	for w in words:
+		# print(words[w])
+		if all_nodes.issubset(set(w)):
+			print("\033[1;32m~~ wrd match:\033[0;0m", words[w])
+			return (w)
+
+		for i in words:
+
+			# we know the two words are compatible
+			if set(w).isdisjoint(i):
+
+				# get last node in word
+				# last_letter = words_found_nodes[words_set.index(w)][-1]
+				# first_letter = words_found_nodes[words_set.index(i)][0]
+
+				last_letter = w[-1]
+				first_letter = i[0]
+
+				flag = 0
+
+				# find if i follows from w
+				if first_letter in set(nx.neighbors(G, last_letter)):
+					# print("~~ sequence :", words[w], words[i])
+					flag += 1
+				else:
+					continue
+				# find if it's using all the nodes
+				if all_nodes.issubset(set(w) | set(i)):
+					# print("~~ is subset:", words[w], words[i])
+					flag += 2
+				if flag == 3:
+					print("\033[1;32m~~     match:\033[0;0m", words[w], words[i])
+					return (w, i)
+
+				# recursivly check
+				if flag == 1:
+					words2 = copy.deepcopy(words)
+					words2.pop(w)
+					words2.pop(i)
+					words2[tuple(list(w) + list(i))] = str(words[w] + words[i])
+					# print("~~     rec  :", words[w], words[i])
+					ret = find_matches(words2, all_nodes)
+					if ret is not None:
+						return ret
+					# print("~~ leave rec:", words[w], words[i], "ret", ret)
+
+		# only print them is they contain the full set of nodes
+
 
 if __name__ == '__main__':
 	foo(path=sys.argv[1].encode('utf-8'))
@@ -209,44 +259,15 @@ if __name__ == '__main__':
 	# use set math to figure out the right como of words I think
 
 	all_nodes = set(G)
-	words_set  = [frozenset(s) for s in words_found_nodes]
+	words_set  = [tuple(s) for s in words_found_nodes]
 	words_word = [get_word(w) for w in words_found_nodes]
 
 	words = dict(zip(words_set, words_word))
-
-	# print(words)
-
-	for w in words:
-		print(words[w])
-
-	print("skdjfhdshfkh\n")
-
-	# find groups of word sets that don't overlap
-	for w in words:
-		print(words[w])
-		if all_nodes.issubset(w):
-			print("\033[1;32m~~ wrd match:\033[0;0m", words[w])
-
-		for i in words:
-
-			# we know the two words are compatible
-			if w.isdisjoint(i):
-
-				# get last node in word
-				last_letter = words_found_nodes[words_set.index(w)][-1]
-				first_letter = words_found_nodes[words_set.index(i)][0]
-
-				flag = 0
-
-				# find if i follows from w
-				if first_letter in set(nx.neighbors(G, last_letter)):
-					print("~~ sequence :", words[w], words[i])
-					flag += 1
-				# find if it's using all the nodes
-				if all_nodes.issubset(w | i):
-					print("~~ is subset:", words[w], words[i])
-					flag += 1
-				if flag == 2:
-					print("\033[1;32m~~     match:\033[0;0m", words[w], words[i])
-
-		# only print them is they contain the full set of nodes
+	ret = find_matches(words, all_nodes)
+	if ret is None:
+		print(ret)
+	# else:
+	# 	if len(ret) == 2:
+	# 		print(words[ret[0]], words[ret[1]])
+	# 	elif len (ret) == 1:
+	# 		print(words[ret[0]])

@@ -72,6 +72,11 @@ Use the password swearitsreceipt to access it.
 In case you forgot the password, maybe hint.dot will help your memory.
 ```
 
+➜  tst git:(main) ✗ py encrypt.py 4 "flag"
+Your secret is now inside password-protected file secret.age.
+Use the password whateverfifthssexwe to access it.
+In case you forgot the password, maybe hint.dot will help your memory.
+
 ## Preformance problems
 
 Preformance turns out to be a issue for the longer passwords, a single word password is ok, 2 starts slowing down and 3 is at least over 30mins didn't let it run for longer
